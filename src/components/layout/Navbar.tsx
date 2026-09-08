@@ -11,15 +11,16 @@ import {
   User,
   LogOut,
   ChevronDown,
-  CheckCircle2,
   AlertTriangle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useStudentOS } from '../../context/StudentOSContext';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import Link from 'next/link';
 
 export const Navbar: React.FC = () => {
-  const { user, streak, gamification, isAdminView, toggleAdminView } = useStudentOS();
+  const { user, streak, gamification, isAdminView, toggleAdminView, theme, toggleTheme } = useStudentOS();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -32,7 +33,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-16 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-4 sm:px-6 flex items-center justify-between">
+      <header className="sticky top-0 z-40 h-16 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-4 sm:px-6 flex items-center justify-between transition-colors">
         {/* Left: Brand & Search Trigger */}
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -62,7 +63,7 @@ export const Navbar: React.FC = () => {
           </button>
         </div>
 
-        {/* Right: Gamification Badges & User Status */}
+        {/* Right: Gamification Badges, Theme Toggle & User Menu */}
         <div className="flex items-center gap-3">
           {/* Universal Streak Badge */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-semibold shadow-sm">
@@ -82,6 +83,15 @@ export const Navbar: React.FC = () => {
             <span className="text-zinc-500">|</span>
             <span className="text-zinc-300 font-mono">{gamification.xp} XP</span>
           </div>
+
+          {/* Theme Toggle Button (Light/Dark) */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm"
+            title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+          </button>
 
           {/* Admin Switcher Toggle Button */}
           <button

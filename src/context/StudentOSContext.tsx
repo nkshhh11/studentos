@@ -37,6 +37,8 @@ import {
   MOCK_ADMIN_STATS,
 } from '../data/mockData';
 
+export type ThemeMode = 'dark' | 'light';
+
 interface StudentOSContextType {
   user: UserProfile;
   streak: StreakData;
@@ -54,6 +56,7 @@ interface StudentOSContextType {
   adminStats: AdminStats;
   aiMessages: AIMessage[];
   isAdminView: boolean;
+  theme: ThemeMode;
   
   // Handlers
   updateUserProfile: (updates: Partial<UserProfile>) => void;
@@ -72,6 +75,7 @@ interface StudentOSContextType {
   useStreakFreeze: () => boolean;
   sendAIMessage: (text: string) => void;
   toggleAdminView: () => void;
+  toggleTheme: () => void;
   logStudyTime: (minutes: number) => void;
 }
 
@@ -93,6 +97,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [careerReport] = useState<CareerReadinessReport>(MOCK_CAREER_REPORT);
   const [adminStats] = useState<AdminStats>(MOCK_ADMIN_STATS);
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
+  const [theme, setTheme] = useState<ThemeMode>('dark');
 
   const [aiMessages, setAiMessages] = useState<AIMessage[]>([
     {
@@ -115,10 +120,40 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       const savedGami = localStorage.getItem('studentos_gamification');
       if (savedGami) setGamification(JSON.parse(savedGami));
+
+      const savedTheme = localStorage.getItem('studentos_theme') as ThemeMode;
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        setTheme(savedTheme);
+      }
     } catch (e) {
       console.error('Error loading state from localStorage:', e);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('studentos_theme', next);
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+  };
 
   const saveToStorage = (key: string, val: any) => {
     try {
@@ -444,6 +479,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         adminStats,
         aiMessages,
         isAdminView,
+        theme,
         updateUserProfile,
         completeOnboarding,
         solveProblem,
@@ -460,6 +496,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         useStreakFreeze,
         sendAIMessage,
         toggleAdminView,
+        toggleTheme,
         logStudyTime,
       }}
     >
