@@ -8,25 +8,18 @@ import {
   ExternalLink,
   CheckCircle2,
   Clock,
-  Filter,
-  Sparkles,
-  BookOpen,
-  Plus,
-  Zap,
 } from 'lucide-react';
-import { Difficulty, PlatformName, Problem } from '../../types/studentos';
+import { Problem } from '../../types/studentos';
 
 export default function ProblemsPage() {
   const { problems, solveProblem, startProblem } = useStudentOS();
 
-  // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
 
-  // Solved Modal state
   const [activeSolveProblem, setActiveSolveProblem] = useState<Problem | null>(null);
   const [personalNotes, setPersonalNotes] = useState('');
 
@@ -72,48 +65,43 @@ export default function ProblemsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-300">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
+    <div className="space-y-5 pb-10">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/80">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Code2 className="w-6 h-6 text-emerald-400" /> Universal Problem Explorer
+          <h1 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
+            <Code2 className="w-5 h-5 text-zinc-400" /> Problem Explorer
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Discover coding problems from LeetCode, Codeforces & CodeChef. Solved problems grant XP & update your Universal Streak.
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Browse and solve coding problems from LeetCode, Codeforces & CodeChef.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800 text-zinc-400">
-          <span className="text-emerald-400 font-bold">
-            {problems.filter((p) => p.status === 'Solved').length} / {problems.length}
-          </span>
-          <span>Problems Solved</span>
+        <div className="text-xs bg-zinc-900 px-3 py-1 rounded-lg border border-zinc-800 text-zinc-400">
+          Solved: <span className="text-zinc-100 font-medium">{problems.filter((p) => p.status === 'Solved').length} / {problems.length}</span>
         </div>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="p-4 bg-zinc-900/90 rounded-2xl border border-zinc-800/80 space-y-4">
-        {/* Search Input */}
+      {/* Toolbar */}
+      <div className="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80 space-y-3">
         <div className="relative">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
+          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
           <input
             type="text"
-            placeholder="Search problems by name or topic (e.g., Two Sum, DP, Trees)..."
+            placeholder="Search problems or topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-zinc-100 focus:outline-none"
           />
         </div>
 
-        {/* Dropdown Filters */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Platform</label>
+            <label className="text-[10px] text-zinc-400 block mb-0.5">Platform</label>
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 focus:outline-none"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-2 py-1 text-zinc-200 focus:outline-none"
             >
               {platforms.map((pl) => (
                 <option key={pl} value={pl}>
@@ -124,11 +112,11 @@ export default function ProblemsPage() {
           </div>
 
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Difficulty</label>
+            <label className="text-[10px] text-zinc-400 block mb-0.5">Difficulty</label>
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 focus:outline-none"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-2 py-1 text-zinc-200 focus:outline-none"
             >
               {difficulties.map((d) => (
                 <option key={d} value={d}>
@@ -139,11 +127,11 @@ export default function ProblemsPage() {
           </div>
 
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Topic</label>
+            <label className="text-[10px] text-zinc-400 block mb-0.5">Topic</label>
             <select
               value={selectedTopic}
               onChange={(e) => setSelectedTopic(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 focus:outline-none"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-2 py-1 text-zinc-200 focus:outline-none"
             >
               {topics.map((t) => (
                 <option key={t} value={t}>
@@ -154,11 +142,11 @@ export default function ProblemsPage() {
           </div>
 
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Status</label>
+            <label className="text-[10px] text-zinc-400 block mb-0.5">Status</label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-zinc-200 focus:outline-none"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-2 py-1 text-zinc-200 focus:outline-none"
             >
               {statuses.map((s) => (
                 <option key={s} value={s}>
@@ -170,95 +158,73 @@ export default function ProblemsPage() {
         </div>
       </div>
 
-      {/* Problems Table / List */}
-      <div className="bg-zinc-900/90 rounded-3xl border border-zinc-800/80 overflow-hidden">
+      {/* Problems Table */}
+      <div className="bg-zinc-900/90 rounded-xl border border-zinc-800/80 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-zinc-300">
-            <thead className="bg-zinc-950 text-zinc-400 uppercase tracking-wider font-semibold text-[10px] border-b border-zinc-800">
+            <thead className="bg-zinc-950 text-zinc-400 font-medium text-[10px] border-b border-zinc-800">
               <tr>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4">Problem Title</th>
-                <th className="py-3.5 px-4">Topic</th>
-                <th className="py-3.5 px-4">Platform</th>
-                <th className="py-3.5 px-4">Difficulty</th>
-                <th className="py-3.5 px-4">Companies</th>
-                <th className="py-3.5 px-4 text-right">Action</th>
+                <th className="py-2.5 px-3.5">Status</th>
+                <th className="py-2.5 px-3.5">Problem Title</th>
+                <th className="py-2.5 px-3.5">Topic</th>
+                <th className="py-2.5 px-3.5">Platform</th>
+                <th className="py-2.5 px-3.5">Difficulty</th>
+                <th className="py-2.5 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
               {filteredProblems.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-zinc-500 italic">
-                    No problems match your selected filters.
+                  <td colSpan={6} className="py-6 text-center text-zinc-500 italic">
+                    No problems match your search.
                   </td>
                 </tr>
               ) : (
                 filteredProblems.map((prob) => (
-                  <tr key={prob.id} className="hover:bg-zinc-800/40 transition-colors group">
-                    {/* Status */}
-                    <td className="py-3.5 px-4">
+                  <tr key={prob.id} className="hover:bg-zinc-800/40 transition-colors">
+                    <td className="py-2.5 px-3.5">
                       {prob.status === 'Solved' ? (
-                        <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 text-emerald-400 text-[11px] font-medium">
                           <CheckCircle2 className="w-3 h-3" /> Solved
                         </span>
                       ) : prob.status === 'Attempted' ? (
-                        <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-[10px] font-bold border border-amber-500/20">
+                        <span className="inline-flex items-center gap-1 text-amber-400 text-[11px] font-medium">
                           <Clock className="w-3 h-3" /> Attempted
                         </span>
                       ) : (
-                        <span className="text-zinc-500 text-[10px]">Unsolved</span>
+                        <span className="text-zinc-500 text-[11px]">Unsolved</span>
                       )}
                     </td>
 
-                    {/* Title */}
-                    <td className="py-3.5 px-4 font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                    <td className="py-2.5 px-3.5 font-medium text-zinc-100">
                       {prob.title}
                     </td>
 
-                    {/* Topic */}
-                    <td className="py-3.5 px-4 text-zinc-400">{prob.topic}</td>
+                    <td className="py-2.5 px-3.5 text-zinc-400">{prob.topic}</td>
 
-                    {/* Platform */}
-                    <td className="py-3.5 px-4">
-                      <span className="bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-300 text-[11px] font-mono">
-                        {prob.platform}
-                      </span>
-                    </td>
+                    <td className="py-2.5 px-3.5 text-zinc-300">{prob.platform}</td>
 
-                    {/* Difficulty */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-2.5 px-3.5">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`text-[11px] font-medium ${
                           prob.difficulty === 'Easy'
-                            ? 'bg-emerald-500/10 text-emerald-400'
+                            ? 'text-emerald-400'
                             : prob.difficulty === 'Medium'
-                            ? 'bg-amber-500/10 text-amber-400'
-                            : 'bg-rose-500/10 text-rose-400'
+                            ? 'text-amber-400'
+                            : 'text-rose-400'
                         }`}
                       >
                         {prob.difficulty}
                       </span>
                     </td>
 
-                    {/* Companies */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {prob.companies?.slice(0, 2).map((comp) => (
-                          <span key={comp} className="bg-zinc-950 text-zinc-400 text-[9px] px-1.5 py-0.5 rounded">
-                            {comp}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-
-                    {/* Action */}
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-2.5 px-3.5 text-right">
                       <button
                         onClick={() => handleOpenProblem(prob)}
-                        className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm shadow-emerald-500/10"
+                        className="inline-flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs px-2.5 py-1 rounded transition-all cursor-pointer"
                       >
                         <span>Solve</span>
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink className="w-3 h-3 text-zinc-400" />
                       </button>
                     </td>
                   </tr>
@@ -269,50 +235,45 @@ export default function ProblemsPage() {
         </div>
       </div>
 
-      {/* Solve / Sync Confirmation Modal */}
+      {/* Active Solve Modal */}
       {activeSolveProblem && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-3xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" /> Tracking Active Session
+              <h3 className="text-sm font-semibold text-zinc-100">
+                Session Active: {activeSolveProblem.title}
               </h3>
-              <span className="text-xs text-emerald-400 font-mono">
+              <span className="text-xs text-zinc-400">
                 +{activeSolveProblem.difficulty === 'Easy' ? 15 : activeSolveProblem.difficulty === 'Medium' ? 30 : 60} XP
               </span>
             </div>
 
-            <div className="p-3 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs">
-              <div className="font-bold text-white mb-0.5">{activeSolveProblem.title}</div>
-              <div className="text-zinc-400">Platform: {activeSolveProblem.platform} • {activeSolveProblem.topic}</div>
-            </div>
-
             <p className="text-xs text-zinc-400 leading-relaxed">
-              We opened the official {activeSolveProblem.platform} page in your browser. Once you've solved it on the platform, click below to log your progress & claim your XP reward.
+              Solve the problem on official {activeSolveProblem.platform}. Click below to mark it solved when finished.
             </p>
 
             <div>
-              <label className="text-xs text-zinc-300 font-medium block mb-1">Add Personal Notes / Key Takeaways</label>
+              <label className="text-xs text-zinc-300 block mb-1">Takeaways / Notes (Optional)</label>
               <textarea
                 value={personalNotes}
                 onChange={(e) => setPersonalNotes(e.target.value)}
-                placeholder="e.g. O(N) HashMap approach, remember edge case for empty arrays..."
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500 h-20"
+                placeholder="Key takeaways..."
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-100 focus:outline-none h-16"
               />
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setActiveSolveProblem(null)}
-                className="flex-1 py-2.5 rounded-xl border border-zinc-800 text-xs text-zinc-400 hover:text-white"
+                className="flex-1 py-2 rounded-lg border border-zinc-800 text-xs text-zinc-400 hover:text-zinc-200"
               >
-                Cancel / Later
+                Close
               </button>
               <button
                 onClick={handleMarkSolved}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
+                className="flex-1 py-2 rounded-lg bg-zinc-100 text-zinc-950 font-semibold text-xs hover:bg-zinc-200"
               >
-                Mark Solved & Claim XP
+                Mark Solved
               </button>
             </div>
           </div>

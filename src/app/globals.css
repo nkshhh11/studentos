@@ -2,47 +2,38 @@
 
 @layer base {
   :root {
-    --bg-primary: #f8fafc;
+    --bg-primary: #fafafa;
     --bg-card: #ffffff;
-    --bg-subtle: #f1f5f9;
-    --border-color: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --accent-emerald: #059669;
-    --accent-indigo: #4f46e5;
-    --accent-purple: #7c3aed;
-    --accent-amber: #d97706;
+    --bg-subtle: #f4f4f5;
+    --border-color: #e4e4e7;
+    --text-primary: #18181b;
+    --text-secondary: #52525b;
+    --text-muted: #71717a;
   }
 
   html.dark {
     --bg-primary: #09090b;
     --bg-card: #18181b;
-    --bg-subtle: #09090b;
+    --bg-subtle: #121215;
     --border-color: #27272a;
     --text-primary: #f4f4f5;
     --text-secondary: #a1a1aa;
     --text-muted: #71717a;
-    --accent-emerald: #10b981;
-    --accent-indigo: #6366f1;
-    --accent-purple: #8b5cf6;
-    --accent-amber: #f59e0b;
   }
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Light mode specific element styling enhancements */
+/* Light mode minimal styling overrides */
 html.light .bg-zinc-950,
 html.light .bg-zinc-950\/80,
 html.light .bg-zinc-950\/60 {
   background-color: #ffffff !important;
-  color: #0f172a !important;
+  color: #18181b !important;
 }
 
 html.light .bg-zinc-900,
@@ -50,31 +41,31 @@ html.light .bg-zinc-900\/90,
 html.light .bg-zinc-900\/60,
 html.light .bg-zinc-900\/80 {
   background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  color: #18181b !important;
+  border-color: #e4e4e7 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
 html.light .border-zinc-800,
 html.light .border-zinc-800\/80,
 html.light .border-zinc-800\/60,
 html.light .border-zinc-900 {
-  border-color: #e2e8f0 !important;
+  border-color: #e4e4e7 !important;
 }
 
 html.light .text-white {
-  color: #0f172a !important;
+  color: #18181b !important;
 }
 
 html.light .text-zinc-100,
 html.light .text-zinc-200,
 html.light .text-zinc-300 {
-  color: #1e293b !important;
+  color: #27272a !important;
 }
 
 html.light .text-zinc-400,
 html.light .text-zinc-500 {
-  color: #64748b !important;
+  color: #71717a !important;
 }
 
 html.light .bg-zinc-800,
@@ -82,19 +73,81 @@ html.light .bg-zinc-800\/40,
 html.light .bg-zinc-800\/60,
 html.light .bg-zinc-800\/80,
 html.light .bg-zinc-800\/90 {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
+  background-color: #f4f4f5 !important;
+  color: #27272a !important;
 }
 
 html.light input,
 html.light select,
 html.light textarea {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  border-color: #d4d4d8 !important;
 }
 
 html.light input::placeholder,
 html.light textarea::placeholder {
-  color: #94a3b8 !important;
+  color: #a1a1aa !important;
+}
+
+/* Minimal badges (Subdued & Clean) */
+html.light .bg-emerald-500\/10 {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+}
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+html.light .bg-amber-500\/10 {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+}
+html.light .text-amber-400,
+html.light .text-amber-300 {
+  color: #d97706 !important;
+}
+
+html.light .bg-purple-500\/10,
+html.light .bg-purple-500\/20 {
+  background-color: #f5f3ff !important;
+  color: #6d28d9 !important;
+}
+html.light .text-purple-400,
+html.light .text-purple-300 {
+  color: #7c3aed !important;
+}
+
+html.light .bg-blue-500\/10,
+html.light .bg-blue-500\/20 {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+html.light .text-blue-400,
+html.light .text-blue-300 {
+  color: #2563eb !important;
+}
+
+html.light .bg-rose-500\/5,
+html.light .bg-rose-500\/10 {
+  background-color: #fff1f2 !important;
+}
+html.light .text-rose-400 {
+  color: #e11d48 !important;
+}
+
+/* Minimal Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.4);
 }
