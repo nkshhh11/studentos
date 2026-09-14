@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Sun,
   Moon,
+  Sparkles,
 } from 'lucide-react';
 import { useStudentOS } from '../../context/StudentOSContext';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
@@ -27,9 +28,11 @@ export const Navbar: React.FC = () => {
     theme,
     toggleTheme,
     isAuthenticated,
+    isAuthLoading,
     openAuthModal,
     logout,
   } = useStudentOS();
+
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -42,25 +45,25 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 bg-zinc-950/90 backdrop-blur border-b border-zinc-800/80 px-4 sm:px-6 flex items-center justify-between transition-colors">
+      <header className="sticky top-0 z-40 h-14 bg-zinc-950/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-4 sm:px-6 flex items-center justify-between transition-colors hidden md:flex">
         {/* Left: Brand & Search */}
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-950 dark:bg-zinc-800 dark:text-zinc-100 font-bold text-sm flex items-center justify-center">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shadow-lg shadow-indigo-500/20">
               S
             </div>
-            <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+            <span className="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">
               StudentOS
             </span>
           </Link>
 
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 bg-zinc-900/50 hover:bg-zinc-800/60 text-zinc-400 text-xs px-3 py-1.5 rounded-lg border border-zinc-800 transition-all w-60 lg:w-72 cursor-pointer"
+            className="flex items-center gap-2 bg-zinc-900/60 hover:bg-zinc-800/80 text-zinc-400 text-xs px-3 py-1.5 rounded-xl border border-zinc-800 transition-all w-60 lg:w-72 cursor-pointer shadow-sm"
           >
             <Search className="w-3.5 h-3.5 text-zinc-500" />
-            <span className="flex-1 text-left truncate">Search...</span>
-            <kbd className="hidden lg:inline-block px-1 py-0.2 bg-zinc-800 text-[10px] rounded text-zinc-400 border border-zinc-700">
+            <span className="flex-1 text-left truncate">Search notes, tasks, problems...</span>
+            <kbd className="hidden lg:inline-block px-1.5 py-0.2 bg-zinc-800 text-[10px] rounded-md text-zinc-400 border border-zinc-700 font-mono">
               ⌘K
             </kbd>
           </button>
@@ -69,32 +72,32 @@ export const Navbar: React.FC = () => {
         {/* Right Controls */}
         <div className="flex items-center gap-2.5">
           {/* Streak Badge */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-300 text-xs font-medium">
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-200 text-xs font-semibold shadow-xs">
+            <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
             <span>{isAuthenticated ? streak.currentStreak : 0}d</span>
           </div>
 
           {/* Level Pill */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-300 font-medium">
-            <Zap className="w-3.5 h-3.5 text-emerald-500" />
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-200 font-semibold shadow-xs">
+            <Zap className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/20" />
             <span>Lvl {isAuthenticated ? gamification.level : 1}</span>
           </div>
 
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all cursor-pointer"
+            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all cursor-pointer shadow-xs"
             title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-600" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-400" />}
           </button>
 
           {/* Admin Switcher */}
           <button
             onClick={toggleAdminView}
-            className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+            className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all border cursor-pointer ${
               isAdminView
-                ? 'bg-zinc-800 border-zinc-700 text-zinc-100'
+                ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
             }`}
           >
@@ -106,24 +109,24 @@ export const Navbar: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setIsNotifOpen(!isNotifOpen)}
-              className="relative p-1.5 text-zinc-400 hover:text-zinc-100 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 transition-colors"
+              className="relative p-1.5 text-zinc-400 hover:text-zinc-100 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-zinc-800 transition-colors cursor-pointer"
             >
               <Bell className="w-4 h-4" />
               {isAuthenticated && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full" />}
             </button>
 
             {isNotifOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl p-3 z-50 animate-in fade-in duration-150">
+              <div className="absolute right-0 mt-2 w-72 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between pb-2 border-b border-zinc-800 mb-2">
-                  <h4 className="text-xs font-semibold text-zinc-200">Notifications</h4>
-                  <span className="text-[10px] text-zinc-400">{isAuthenticated ? '3 New' : '0 New'}</span>
+                  <h4 className="text-xs font-bold text-zinc-100">Notifications</h4>
+                  <span className="text-[10px] text-zinc-400 font-mono">{isAuthenticated ? '3 New' : '0 New'}</span>
                 </div>
                 <div className="space-y-2">
                   {isAuthenticated ? (
                     notifications.map((n) => (
-                      <div key={n.id} className="p-2 bg-zinc-950 rounded-lg border border-zinc-800/80 text-xs">
-                        <div className="text-zinc-300">{n.text}</div>
-                        <div className="text-[10px] text-zinc-500 mt-0.5">{n.time}</div>
+                      <div key={n.id} className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80 text-xs">
+                        <div className="text-zinc-200 font-medium">{n.text}</div>
+                        <div className="text-[10px] text-zinc-400 mt-0.5">{n.time}</div>
                       </div>
                     ))
                   ) : (
@@ -137,29 +140,40 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* User Menu / Auth Buttons */}
-          {isAuthenticated && user ? (
+          {isAuthLoading ? (
+            <div className="w-20 h-7 bg-zinc-900 animate-pulse rounded-xl" />
+          ) : isAuthenticated && user ? (
             <div className="relative">
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-1.5 p-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 transition-colors cursor-pointer"
+                className="flex items-center gap-2 p-1 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-zinc-800 transition-colors cursor-pointer"
               >
-                <img src={user.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=student'} alt={user.name} className="w-6 h-6 rounded object-cover" />
-                <ChevronDown className="w-3 h-3 text-zinc-400" />
+                <img src={user.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=student'} alt={user.name} className="w-7 h-7 rounded-lg object-cover" />
+                <span className="text-xs font-semibold text-zinc-200 max-w-[120px] truncate hidden xl:inline-block">{user.name}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
               </button>
 
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl p-1.5 z-50 animate-in fade-in duration-150">
-                  <div className="p-2 border-b border-zinc-800 mb-1">
-                    <div className="text-xs font-semibold text-zinc-100">{user.name}</div>
-                    <div className="text-[10px] text-zinc-400 truncate">{user.careerGoal || 'Student'}</div>
+                <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in duration-150">
+                  <div className="p-2.5 border-b border-zinc-800 mb-1">
+                    <div className="text-xs font-bold text-zinc-100">{user.name}</div>
+                    <div className="text-[10px] text-zinc-400 truncate">{user.email || user.careerGoal || 'Student'}</div>
                   </div>
 
                   <Link
                     href="/onboarding"
                     onClick={() => setIsProfileMenuOpen(false)}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
-                    <User className="w-3.5 h-3.5 text-zinc-400" /> Profile & Settings
+                    <User className="w-3.5 h-3.5 text-zinc-400" /> Profile
+                  </Link>
+
+                  <Link
+                    href="/onboarding"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-zinc-400" /> Settings
                   </Link>
 
                   <button
@@ -167,7 +181,7 @@ export const Navbar: React.FC = () => {
                       toggleAdminView();
                       setIsProfileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors text-left cursor-pointer"
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors text-left cursor-pointer"
                   >
                     <Shield className="w-3.5 h-3.5 text-zinc-400" /> Toggle Admin View
                   </button>
@@ -178,9 +192,9 @@ export const Navbar: React.FC = () => {
                         logout();
                         setIsProfileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left cursor-pointer"
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left cursor-pointer font-semibold"
                     >
-                      <LogOut className="w-3.5 h-3.5" /> Sign Out
+                      <LogOut className="w-3.5 h-3.5" /> Logout
                     </button>
                   </div>
                 </div>
@@ -189,14 +203,14 @@ export const Navbar: React.FC = () => {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => openAuthModal('Sign In to StudentOS', 'Access your personal workspace, notes, tasks, and progress track.')}
-                className="px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-zinc-200 transition-colors cursor-pointer"
+                onClick={() => openAuthModal('Sign In to StudentOS')}
+                className="px-3.5 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-zinc-200 transition-colors cursor-pointer"
               >
                 Sign In
               </button>
               <button
-                onClick={() => openAuthModal('Create your StudentOS Account', 'Sign up with Google, Microsoft, or Mobile OTP to save your data.')}
-                className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-xs font-bold text-zinc-950 transition-colors cursor-pointer shadow-sm"
+                onClick={() => openAuthModal('Create your StudentOS Account')}
+                className="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition-all cursor-pointer shadow-md shadow-indigo-600/20"
               >
                 Get Started
               </button>

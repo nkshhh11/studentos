@@ -198,7 +198,7 @@ export default function AIMentorPage() {
             />
             <button
               type="submit"
-              className="px-5 py-2.5 bg-purple-500 hover:bg-purple-400 text-black font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
             >
               <span>Send</span>
               <Send className="w-3.5 h-3.5" />
@@ -283,7 +283,7 @@ export default function AIMentorPage() {
           <button
             onClick={handleAnalyzeResume}
             disabled={isAnalyzingResume || !resumeText.trim()}
-            className="px-6 py-2.5 bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-black font-bold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
+            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
           >
             {isAnalyzingResume ? 'Evaluating Resume...' : 'Analyze Resume ATS Score'}
           </button>

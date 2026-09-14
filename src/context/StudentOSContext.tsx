@@ -393,6 +393,26 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     closeAuthModal();
   };
 
+  // Local storage user vault helpers
+  const getLocalRegisteredUsers = () => {
+    try {
+      const raw = localStorage.getItem('studentos_registered_users');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const saveLocalRegisteredUser = (userRecord: { id: string; name: string; email: string; passHash: string; profile: UserProfile }) => {
+    try {
+      const users = getLocalRegisteredUsers();
+      users[userRecord.email.toLowerCase()] = userRecord;
+      localStorage.setItem('studentos_registered_users', JSON.stringify(users));
+    } catch (e) {
+      console.error('Failed to save local user registration:', e);
+    }
+  };
+
   // Sign Up with Email & Password
   const signUpWithEmail = async (name: string, email: string, pass: string) => {
     if (isFirebaseConfigured && auth) {
@@ -417,11 +437,19 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       await saveUserProfileDB(profile);
       await authenticateUser(profile, 'email');
     } else {
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUsers = getLocalRegisteredUsers();
+      if (existingUsers[normalizedEmail]) {
+        const err: any = new Error('An account with this email address already exists. Please sign in instead.');
+        err.code = 'auth/email-already-in-use';
+        throw err;
+      }
+
       const userId = `usr_email_${Date.now()}`;
       const profile: UserProfile = {
         id: userId,
         name: name.trim() || 'Student',
-        email: email.trim(),
+        email: normalizedEmail,
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + userId,
         college: 'University',
         branch: 'Computer Science',
@@ -435,6 +463,15 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isOnboarded: false,
         createdAt: new Date().toISOString().split('T')[0],
       };
+
+      saveLocalRegisteredUser({
+        id: userId,
+        name: name.trim() || 'Student',
+        email: normalizedEmail,
+        passHash: btoa(pass),
+        profile,
+      });
+
       await authenticateUser(profile, 'email');
     }
   };
@@ -466,28 +503,23 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
       await authenticateUser(profile, 'email');
     } else {
-      const nameFromEmail = email.split('@')[0].replace(/[._]/g, ' ');
-      const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
-      const userId = `usr_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUsers = getLocalRegisteredUsers();
+      const userRecord = existingUsers[normalizedEmail];
 
-      const profile: UserProfile = {
-        id: userId,
-        name: formattedName || 'Student User',
-        email: email,
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + userId,
-        college: 'Engineering Institute',
-        branch: 'Computer Science',
-        year: '3rd Year',
-        graduationYear: '2027',
-        skillLevel: 'Intermediate',
-        careerGoal: 'Software Engineer',
-        selectedLanguages: ['C++', 'JavaScript'],
-        connectedAccounts: [],
-        availableStudyTime: '3 hours/day',
-        isOnboarded: true,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      await authenticateUser(profile, 'email');
+      if (!userRecord) {
+        const err: any = new Error('No account found with this email address. Please sign up first.');
+        err.code = 'auth/user-not-found';
+        throw err;
+      }
+
+      if (userRecord.passHash !== btoa(pass)) {
+        const err: any = new Error('Invalid password. Please check your credentials and try again.');
+        err.code = 'auth/wrong-password';
+        throw err;
+      }
+
+      await authenticateUser(userRecord.profile, 'email');
     }
   };
 
@@ -703,6 +735,10 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setNotes([]);
     setBookmarks([]);
     setProjects([]);
+
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   const openAuthModal = (title = 'Sign In to Student OS', subtitle = 'Please sign in to save and manage your personal Student OS.') => {

@@ -23,7 +23,7 @@ export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeTabParam = searchParams.get('tab');
-  const { isAdminView } = useStudentOS();
+  const { isAdminView, user, isAuthenticated } = useStudentOS();
 
   const primaryItems = [
     { name: 'Home', href: '/dashboard', icon: Home },
@@ -61,14 +61,14 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-56 bg-zinc-950/80 border-r border-zinc-800/80 flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-3 hidden md:flex">
-      <div className="space-y-4 flex-1">
+    <aside className="w-60 bg-zinc-950/80 border-r border-zinc-800/80 flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 hidden md:flex">
+      <div className="space-y-5 flex-1">
         {/* Core Quick Access (Home, Tasks, Notes, Calendar) */}
         <div>
-          <div className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+          <div className="px-2.5 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
             Quick Access
           </div>
-          <div className="space-y-0.5 mt-1">
+          <div className="space-y-1 mt-1.5">
             {primaryItems.map((item) => {
               const Icon = item.icon;
               const active = isPrimaryActive(item);
@@ -76,15 +76,15 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all group ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
                     active
-                      ? 'bg-zinc-800 text-zinc-100 shadow-sm'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                      ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/60'
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 transition-colors ${
-                      active ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'
+                      active ? 'text-indigo-400' : 'text-zinc-400 group-hover:text-zinc-300'
                     }`}
                   />
                   <span>{item.name}</span>
@@ -96,10 +96,10 @@ export const Sidebar: React.FC = () => {
 
         {/* OS Modules */}
         <div>
-          <div className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+          <div className="px-2.5 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
             Modules
           </div>
-          <div className="space-y-0.5 mt-1">
+          <div className="space-y-1 mt-1.5">
             {moduleItems.map((item) => {
               const Icon = item.icon;
               const active = isModuleActive(item);
@@ -107,22 +107,22 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all group ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
                     active
-                      ? 'bg-zinc-800 text-zinc-100 shadow-sm'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                      ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/60'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon
                       className={`w-4 h-4 transition-colors ${
-                        active ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'
+                        active ? 'text-indigo-400' : 'text-zinc-400 group-hover:text-zinc-300'
                       }`}
                     />
                     <span>{item.name}</span>
                   </div>
                   {item.badge && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/50">
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-zinc-900 text-zinc-400 border border-zinc-800">
                       {item.badge}
                     </span>
                   )}
@@ -135,13 +135,13 @@ export const Sidebar: React.FC = () => {
 
       {/* Target Status Card */}
       <div className="mt-auto pt-3 border-t border-zinc-900">
-        <div className="p-2.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80 space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-medium text-zinc-300">
-            <span>Goal: Software Engineer</span>
-            <span className="text-[10px] text-emerald-400 font-mono">68%</span>
+        <div className="p-3 bg-zinc-900/80 rounded-2xl border border-zinc-800/80 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-200">
+            <span className="truncate">{isAuthenticated && user?.careerGoal ? `Goal: ${user.careerGoal}` : 'Goal: Software Engineer'}</span>
+            <span className="text-[10px] text-emerald-400 font-mono font-bold shrink-0 ml-1">68%</span>
           </div>
-          <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
-            <div className="bg-emerald-500 h-full w-[68%]" />
+          <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-[68%]" />
           </div>
         </div>
       </div>

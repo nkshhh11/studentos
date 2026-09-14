@@ -285,7 +285,7 @@ function AnalyticsContent() {
             />
             <button
               type="submit"
-              className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs rounded-xl cursor-pointer"
+              className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-md"
             >
               Save Note
             </button>
@@ -357,7 +357,7 @@ function AnalyticsContent() {
             </div>
             <button
               type="submit"
-              className="px-5 py-2 bg-purple-500 hover:bg-purple-400 text-black font-bold text-xs rounded-xl cursor-pointer"
+              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-md"
             >
               Add Bookmark
             </button>

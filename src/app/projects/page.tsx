@@ -66,9 +66,9 @@ export default function ProjectsPage() {
         <button
           onClick={handleAnalyzePortfolio}
           disabled={isAnalyzing}
-          className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 text-black font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 cursor-pointer disabled:opacity-50"
         >
-          <Sparkles className="w-4 h-4 fill-black" />
+          <Sparkles className="w-4 h-4 fill-white text-white" />
           {isAnalyzing ? 'Analyzing GitHub Repo...' : 'Run GitHub Portfolio AI Audit'}
         </button>
       </div>
@@ -95,7 +95,7 @@ export default function ProjectsPage() {
           </p>
           <button
             onClick={() => requireAuth(() => {}, 'Sign in to create your first personal project.')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-black font-bold text-xs rounded-xl cursor-pointer shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-lg"
           >
             <Plus className="w-4 h-4" /> Create Your First Project
           </button>
@@ -184,7 +184,7 @@ export default function ProjectsPage() {
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-black font-bold text-xs rounded-xl flex items-center gap-1 cursor-pointer"
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs rounded-xl flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-4 h-4" /> Add Task
                   </button>

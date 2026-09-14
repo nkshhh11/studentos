@@ -200,7 +200,7 @@ export default function LearnPage() {
 
             <button
               onClick={() => handleStartQuiz(currentLang)}
-              className="w-full py-3 rounded-2xl bg-blue-500 hover:bg-blue-400 text-black font-bold text-xs transition-colors shadow-lg shadow-blue-500/20 cursor-pointer"
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition-colors shadow-lg shadow-indigo-500/20 cursor-pointer"
             >
               Start {currentLang.name} Quiz Now
             </button>
@@ -288,14 +288,14 @@ export default function LearnPage() {
                     <button
                       onClick={handleSubmitAnswer}
                       disabled={selectedOption === null}
-                      className="px-5 py-2 bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-black font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                      className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer shadow-md"
                     >
                       Submit Answer
                     </button>
                   ) : (
                     <button
                       onClick={handleNextQuestion}
-                      className="px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer flex items-center gap-1 shadow-md"
                     >
                       Next Question <ChevronRight className="w-4 h-4" />
                     </button>
@@ -316,7 +316,7 @@ export default function LearnPage() {
                 <div className="pt-4">
                   <button
                     onClick={() => setActiveQuizLang(null)}
-                    className="px-6 py-2.5 bg-emerald-500 text-black font-bold text-xs rounded-xl hover:bg-emerald-400"
+                    className="px-6 py-2.5 bg-emerald-600 text-white font-extrabold text-xs rounded-xl hover:bg-emerald-500 shadow-md"
                   >
                     Back to Knowledge Hub
                   </button>

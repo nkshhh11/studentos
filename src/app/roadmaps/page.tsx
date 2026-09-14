@@ -181,7 +181,7 @@ export default function RoadmapsPage() {
                     onClick={() => handleStatusChange(st)}
                     className={`py-2 px-3 rounded-xl font-bold border transition-all ${
                       selectedNode.node.status === st
-                        ? 'bg-purple-500 text-black border-purple-400'
+                        ? 'bg-purple-600 text-white font-extrabold border-purple-500 shadow-md'
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
                     }`}
                   >

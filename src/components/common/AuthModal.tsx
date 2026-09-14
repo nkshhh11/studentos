@@ -205,6 +205,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (confirmationResult) {
         await verifyPhoneOTP(confirmationResult, otpCode.trim());
       } else {
+        if (otpCode.trim() !== '1234' && otpCode.trim() !== '123456') {
+          throw new Error('Invalid SMS verification code. Please enter 1234 to verify.');
+        }
         loginWithOTP(phone, otpCode.trim());
       }
       setIsLoading(false);
@@ -327,7 +330,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md"
             >
               {isLoading ? (
                 <>
@@ -411,7 +414,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md"
             >
               {isLoading ? (
                 <>
@@ -508,7 +511,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md"
                 >
                   {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>Verify OTP & Login</span><ShieldCheck className="w-4 h-4" /></>}
                 </button>
@@ -528,7 +531,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </p>
             <button
               onClick={handleDemoLogin}
-              className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+              className="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer mt-2 shadow-md"
             >
               <span>Launch Demo Session</span>
               <ArrowRight className="w-4 h-4" />
