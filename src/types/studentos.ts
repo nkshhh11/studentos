@@ -232,9 +232,20 @@ export interface Bookmark {
 export interface AIMessage {
   id: string;
   sender: 'user' | 'ai';
+  role?: 'user' | 'assistant' | 'system';
   text: string;
   timestamp: string;
   suggestions?: string[];
+  isError?: boolean;
+}
+
+export interface AIConversation {
+  id: string;
+  title: string;
+  userId: string;
+  messages: AIMessage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CareerReadinessReport {

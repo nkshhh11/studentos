@@ -99,6 +99,7 @@ interface StudentOSContextType {
   careerReport: CareerReadinessReport;
   adminStats: AdminStats;
   aiMessages: AIMessage[];
+  isAILoading: boolean;
   isAdminView: boolean;
   theme: ThemeMode;
   
@@ -131,7 +132,8 @@ interface StudentOSContextType {
   addBookmark: (bookmark: Omit<Bookmark, 'id'>) => void;
   deleteBookmark: (id: string) => void;
   useStreakFreeze: () => boolean;
-  sendAIMessage: (text: string) => void;
+  sendAIMessage: (text: string) => Promise<void>;
+  clearAIChat: () => void;
   toggleAdminView: () => void;
   toggleTheme: () => void;
   logStudyTime: (minutes: number) => void;
@@ -194,15 +196,8 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [theme, setTheme] = useState<ThemeMode>('dark');
 
-  const [aiMessages, setAiMessages] = useState<AIMessage[]>([
-    {
-      id: 'm1',
-      sender: 'ai',
-      text: "Hello! I'm your StudentOS AI Mentor. Ask me any question about DSA, Roadmap, or Career prep!",
-      timestamp: '10:00 AM',
-      suggestions: ['Explain DP vs Recursion', 'Create a 7-day study plan', 'Give me a binary tree quiz'],
-    },
-  ]);
+  const [aiMessages, setAiMessages] = useState<AIMessage[]>([]);
+  const [isAILoading, setIsAILoading] = useState<boolean>(false);
 
   // Load user data from Firestore or LocalStorage fallback
   const loadUserData = async (userId: string) => {
@@ -229,6 +224,8 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (dbProjects.length > 0) setProjects(dbProjects);
       else loadLocalProjects(userId);
+
+      loadLocalAIChats(userId);
     } catch (e) {
       console.error('Error loading Firestore data, using local storage:', e);
       loadLocalUserData(userId);
@@ -241,6 +238,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     loadLocalNotes(userId);
     loadLocalBookmarks(userId);
     loadLocalProjects(userId);
+    loadLocalAIChats(userId);
   };
 
   const loadLocalStreak = (userId: string) => {
@@ -271,6 +269,19 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const p = localStorage.getItem(`studentos_projects_${userId}`);
     if (p) setProjects(JSON.parse(p));
     else setProjects([]);
+  };
+
+  const loadLocalAIChats = (userId: string) => {
+    const c = localStorage.getItem(`studentos_ai_chats_${userId}`);
+    if (c) {
+      try {
+        setAiMessages(JSON.parse(c));
+      } catch (e) {
+        setAiMessages([]);
+      }
+    } else {
+      setAiMessages([]);
+    }
   };
 
   const saveUserData = (userId: string, key: string, val: any) => {
@@ -1101,36 +1112,88 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, 'Please sign in to log study time.');
   };
 
-  const sendAIMessage = (text: string) => {
+  const sendAIMessage = async (text: string) => {
+    if (!text.trim()) return;
+
     const userMsg: AIMessage = {
-      id: `msg_${Date.now()}`,
+      id: `msg_usr_${Date.now()}`,
       sender: 'user',
-      text,
+      role: 'user',
+      text: text.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setAiMessages((prev) => [...prev, userMsg]);
+    const updatedWithUser = [...aiMessages, userMsg];
+    setAiMessages(updatedWithUser);
+    setIsAILoading(true);
 
-    setTimeout(() => {
-      let aiText = "That's a great question! Consistent practice and topic revision is key. Let's break this down into clear steps.";
-      let suggestions: string[] = ['Give me practice problems', 'Show code example', 'Explain visual analogy'];
+    if (user?.id) {
+      saveUserData(user.id, 'ai_chats', updatedWithUser);
+    }
 
-      const lower = text.toLowerCase();
-      if (lower.includes('dp') || lower.includes('dynamic programming')) {
-        aiText = "Dynamic Programming breaks down complex problems into overlapping subproblems. 1) Start with Recursion + Memoization (Top-Down). 2) Identify the state parameters. 3) Define base cases clearly. Try solving 'Climbing Stairs' first, then move to 'Coin Change'!";
-        suggestions = ['Practice Coin Change', 'Explain 1D vs 2D DP', 'Show Memoization template'];
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text.trim(),
+          history: updatedWithUser,
+          userProfile: user
+            ? { name: user.name, careerGoal: user.careerGoal, skillLevel: user.skillLevel }
+            : undefined,
+        }),
+      });
+
+      const data = await response.json();
+      setIsAILoading(false);
+
+      if (data.error) {
+        const errorMsg: AIMessage = {
+          id: `msg_err_${Date.now()}`,
+          sender: 'ai',
+          role: 'assistant',
+          text: `⚠️ **AI Mentor Notice**: ${data.error}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isError: true,
+        };
+        const finalMessages = [...updatedWithUser, errorMsg];
+        setAiMessages(finalMessages);
+        if (user?.id) saveUserData(user.id, 'ai_chats', finalMessages);
+        return;
       }
 
       const aiReply: AIMessage = {
-        id: `ai_${Date.now()}`,
+        id: `msg_ai_${Date.now()}`,
         sender: 'ai',
-        text: aiText,
+        role: 'assistant',
+        text: data.reply || "I'm sorry, I couldn't process that request.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        suggestions,
       };
 
-      setAiMessages((prev) => [...prev, aiReply]);
-    }, 600);
+      const finalMessages = [...updatedWithUser, aiReply];
+      setAiMessages(finalMessages);
+      if (user?.id) saveUserData(user.id, 'ai_chats', finalMessages);
+    } catch (err: any) {
+      setIsAILoading(false);
+      const networkErrorMsg: AIMessage = {
+        id: `msg_err_${Date.now()}`,
+        sender: 'ai',
+        role: 'assistant',
+        text: `⚠️ **Connection Error**: Failed to reach AI Mentor service. Please check your connection.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isError: true,
+      };
+      const finalMessages = [...updatedWithUser, networkErrorMsg];
+      setAiMessages(finalMessages);
+      if (user?.id) saveUserData(user.id, 'ai_chats', finalMessages);
+    }
+  };
+
+  const clearAIChat = () => {
+    setAiMessages([]);
+    if (user?.id) {
+      saveUserData(user.id, 'ai_chats', []);
+    }
   };
 
   const toggleAdminView = () => setIsAdminView((prev) => !prev);
@@ -1159,6 +1222,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         careerReport,
         adminStats,
         aiMessages,
+        isAILoading,
         isAdminView,
         theme,
         signUpWithEmail,
@@ -1188,6 +1252,7 @@ export const StudentOSProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         deleteBookmark,
         useStreakFreeze,
         sendAIMessage,
+        clearAIChat,
         toggleAdminView,
         toggleTheme,
         logStudyTime,
