@@ -12,7 +12,7 @@ import {
 import { Problem } from '../../types/studentos';
 
 export default function ProblemsPage() {
-  const { problems, solveProblem, startProblem } = useStudentOS();
+  const { problems, solveProblem, startProblem, requireAuth } = useStudentOS();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
@@ -50,18 +50,22 @@ export default function ProblemsPage() {
   });
 
   const handleOpenProblem = (prob: Problem) => {
-    startProblem(prob.id);
-    window.open(prob.officialUrl, '_blank', 'noopener,noreferrer');
-    setActiveSolveProblem(prob);
-    setPersonalNotes(prob.personalNotes || '');
+    requireAuth(() => {
+      startProblem(prob.id);
+      window.open(prob.officialUrl, '_blank', 'noopener,noreferrer');
+      setActiveSolveProblem(prob);
+      setPersonalNotes(prob.personalNotes || '');
+    }, 'Sign in to start practicing problems and track your progress.');
   };
 
   const handleMarkSolved = () => {
-    if (activeSolveProblem) {
-      solveProblem(activeSolveProblem.id, personalNotes);
-      setActiveSolveProblem(null);
-      setPersonalNotes('');
-    }
+    requireAuth(() => {
+      if (activeSolveProblem) {
+        solveProblem(activeSolveProblem.id, personalNotes);
+        setActiveSolveProblem(null);
+        setPersonalNotes('');
+      }
+    }, 'Sign in to record your solved problems and earn XP.');
   };
 
   return (

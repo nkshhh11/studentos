@@ -17,7 +17,7 @@ import { LANGUAGE_HUB } from '../../data/mockData';
 import { LanguageHubItem, ProgrammingLanguage, QuizQuestion } from '../../types/studentos';
 
 export default function LearnPage() {
-  const { dsaTopics, updateTopicProgress } = useStudentOS();
+  const { dsaTopics, updateTopicProgress, requireAuth } = useStudentOS();
   const [selectedLangId, setSelectedLangId] = useState<ProgrammingLanguage>('C++');
 
   // Quiz Modal State
@@ -31,12 +31,14 @@ export default function LearnPage() {
   const currentLang = LANGUAGE_HUB.find((l) => l.id === selectedLangId) || LANGUAGE_HUB[0];
 
   const handleStartQuiz = (lang: LanguageHubItem) => {
-    setActiveQuizLang(lang);
-    setCurrentQuizIdx(0);
-    setSelectedOption(null);
-    setIsAnswerSubmitted(false);
-    setQuizScore(0);
-    setIsQuizCompleted(false);
+    requireAuth(() => {
+      setActiveQuizLang(lang);
+      setCurrentQuizIdx(0);
+      setSelectedOption(null);
+      setIsAnswerSubmitted(false);
+      setQuizScore(0);
+      setIsQuizCompleted(false);
+    }, 'Sign in to attempt language quizzes and test your skills.');
   };
 
   const handleSelectOption = (idx: number) => {

@@ -26,6 +26,8 @@ export default function DashboardPage() {
     useStreakFreeze,
     claimQuest,
     logStudyTime,
+    isAuthenticated,
+    requireAuth,
   } = useStudentOS();
 
   const [logTimeMinutes, setLogTimeMinutes] = useState(30);
@@ -33,9 +35,34 @@ export default function DashboardPage() {
 
   const weakTopic = [...dsaTopics].sort((a, b) => a.confidenceScore - b.confidenceScore)[0];
 
+  const handleLogTimeClick = () => {
+    requireAuth(() => {
+      setShowLogModal(true);
+    }, 'Sign in to log your study sessions and track your daily effort.');
+  };
+
   const handleLogTime = () => {
     logStudyTime(Number(logTimeMinutes));
     setShowLogModal(false);
+  };
+
+  const handleSolveDailyClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      requireAuth(() => {}, 'Sign in to solve daily DSA problems and earn XP.');
+    }
+  };
+
+  const handleClaimQuest = (questId: string) => {
+    requireAuth(() => {
+      claimQuest(questId);
+    }, 'Sign in to claim your quest rewards and gain level XP.');
+  };
+
+  const handleStreakFreeze = () => {
+    requireAuth(() => {
+      useStreakFreeze();
+    }, 'Sign in to protect your streak with streak freezes.');
   };
 
   return (
@@ -44,25 +71,30 @@ export default function DashboardPage() {
       <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="text-xs font-medium text-zinc-400 mb-1">
-            Welcome back, {user.name}
+            {isAuthenticated && user ? `Welcome back, ${user.name}` : 'Welcome to StudentOS'}
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">
             Dashboard Overview
           </h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Target Goal: <span className="text-zinc-200 font-medium">{user.careerGoal}</span> • {user.college}
+            {isAuthenticated && user ? (
+              <>Target Goal: <span className="text-zinc-200 font-medium">{user.careerGoal || 'Software Engineer'}</span> • {user.college || 'Engineering Student'}</>
+            ) : (
+              'Start organizing your student life, track personal tasks, DSA practice, and career goals.'
+            )}
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0">
           <Link
             href="/problems"
+            onClick={handleSolveDailyClick}
             className="flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-semibold text-xs px-3.5 py-2 rounded-lg transition-all"
           >
             <Play className="w-3.5 h-3.5 fill-current" /> Solve Daily Problem
           </Link>
           <button
-            onClick={() => setShowLogModal(true)}
+            onClick={handleLogTimeClick}
             className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-medium text-xs px-3.5 py-2 rounded-lg border border-zinc-800 transition-all cursor-pointer"
           >
             <Clock className="w-3.5 h-3.5 text-zinc-400" /> Log Time
@@ -79,15 +111,15 @@ export default function DashboardPage() {
             <Flame className="w-4 h-4 text-amber-500" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-zinc-100">{streak.currentStreak}</span>
+            <span className="text-2xl font-bold text-zinc-100">{isAuthenticated ? streak.currentStreak : 0}</span>
             <span className="text-xs text-zinc-400">Days</span>
           </div>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-800/60 text-xs text-zinc-400">
-            <span>Best: <strong className="text-zinc-200 font-medium">{streak.bestStreak}d</strong></span>
-            {streak.streakFreezes > 0 ? (
+            <span>Best: <strong className="text-zinc-200 font-medium">{isAuthenticated ? streak.bestStreak : 0}d</strong></span>
+            {isAuthenticated && streak.streakFreezes > 0 ? (
               <button
-                onClick={useStreakFreeze}
-                className="text-[11px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700 hover:bg-zinc-700"
+                onClick={handleStreakFreeze}
+                className="text-[11px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700 hover:bg-zinc-700 cursor-pointer"
               >
                 Use Freeze (❄️ {streak.streakFreezes})
               </button>
@@ -104,13 +136,13 @@ export default function DashboardPage() {
             <Code2 className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-zinc-100">{gamification.problemsSolvedToday}</span>
+            <span className="text-2xl font-bold text-zinc-100">{isAuthenticated ? gamification.problemsSolvedToday : 0}</span>
             <span className="text-xs text-zinc-400">Today</span>
-            <span className="text-xs text-emerald-400 ml-auto font-medium">+{gamification.problemsSolvedThisWeek} this week</span>
+            <span className="text-xs text-emerald-400 ml-auto font-medium">+{isAuthenticated ? gamification.problemsSolvedThisWeek : 0} this week</span>
           </div>
           <div className="mt-2 pt-2 border-t border-zinc-800/60 text-xs text-zinc-400 flex justify-between">
             <span>Total Solved:</span>
-            <span className="text-zinc-200 font-medium">{gamification.totalProblemsSolved}</span>
+            <span className="text-zinc-200 font-medium">{isAuthenticated ? gamification.totalProblemsSolved : 0}</span>
           </div>
         </div>
 
@@ -122,14 +154,14 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl font-bold text-zinc-100">
-              {Math.floor(gamification.studyTimeTodayMinutes / 60)}h {gamification.studyTimeTodayMinutes % 60}m
+              {isAuthenticated ? `${Math.floor(gamification.studyTimeTodayMinutes / 60)}h ${gamification.studyTimeTodayMinutes % 60}m` : '0h 0m'}
             </span>
             <span className="text-xs text-zinc-400">Today</span>
           </div>
           <div className="mt-2 pt-2 border-t border-zinc-800/60 text-xs text-zinc-400 flex justify-between">
             <span>Week Total:</span>
             <span className="text-zinc-200 font-medium">
-              {Math.floor(gamification.studyTimeWeekMinutes / 60)}h {gamification.studyTimeWeekMinutes % 60}m
+              {isAuthenticated ? `${Math.floor(gamification.studyTimeWeekMinutes / 60)}h ${gamification.studyTimeWeekMinutes % 60}m` : '0h 0m'}
             </span>
           </div>
         </div>
@@ -140,12 +172,14 @@ export default function DashboardPage() {
             <span className="text-xs font-medium text-zinc-400">Active Goal</span>
             <Target className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-sm font-semibold text-zinc-100 truncate">Complete Trees & BST</div>
+          <div className="text-sm font-semibold text-zinc-100 truncate">
+            {isAuthenticated ? 'Complete Trees & BST' : 'Set Your First Goal'}
+          </div>
           <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-2 mb-1">
-            <div className="bg-purple-500 h-full w-[70%]" />
+            <div className="bg-purple-500 h-full" style={{ width: isAuthenticated ? '70%' : '0%' }} />
           </div>
           <div className="flex justify-between text-xs text-zinc-400 mt-1.5">
-            <span>Progress: <strong className="text-zinc-200 font-medium">70%</strong></span>
+            <span>Progress: <strong className="text-zinc-200 font-medium">{isAuthenticated ? '70%' : '0%'}</strong></span>
             <Link href="/roadmaps" className="text-zinc-300 hover:text-white underline">Continue</Link>
           </div>
         </div>
@@ -157,7 +191,7 @@ export default function DashboardPage() {
             <AlertTriangle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-sm font-semibold text-zinc-100 truncate">{weakTopic?.title || 'Dynamic Programming'}</div>
-          <div className="text-xs text-zinc-400 mt-0.5">Confidence: <span className="text-rose-400 font-medium">{weakTopic?.confidenceScore}%</span></div>
+          <div className="text-xs text-zinc-400 mt-0.5">Confidence: <span className="text-rose-400 font-medium">{isAuthenticated ? weakTopic?.confidenceScore : 0}%</span></div>
           <div className="mt-2 pt-1.5 border-t border-zinc-800/60">
             <Link href="/problems" className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-medium">
               Practice Now <ArrowUpRight className="w-3.5 h-3.5" />
@@ -172,18 +206,18 @@ export default function DashboardPage() {
             <Zap className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-zinc-100">Lvl {gamification.level}</span>
-            <span className="text-xs text-zinc-400">{gamification.levelTitle}</span>
+            <span className="text-2xl font-bold text-zinc-100">Lvl {isAuthenticated ? gamification.level : 1}</span>
+            <span className="text-xs text-zinc-400">{isAuthenticated ? gamification.levelTitle : 'Beginner'}</span>
           </div>
           <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-2 mb-1">
             <div
               className="bg-cyan-500 h-full"
-              style={{ width: `${Math.min(100, (gamification.xp / gamification.nextLevelXp) * 100)}%` }}
+              style={{ width: isAuthenticated ? `${Math.min(100, (gamification.xp / gamification.nextLevelXp) * 100)}%` : '0%' }}
             />
           </div>
           <div className="flex justify-between text-[11px] text-zinc-400 mt-1">
-            <span>{gamification.xp} XP</span>
-            <span>Next: {gamification.nextLevelXp} XP</span>
+            <span>{isAuthenticated ? gamification.xp : 0} XP</span>
+            <span>Next: {isAuthenticated ? gamification.nextLevelXp : 200} XP</span>
           </div>
         </div>
       </div>
@@ -226,7 +260,7 @@ export default function DashboardPage() {
                     <span className="text-xs text-amber-400 font-mono">+{quest.xpReward} XP</span>
                     {quest.completed && quest.xpReward > 0 && (
                       <button
-                        onClick={() => claimQuest(quest.id)}
+                        onClick={() => handleClaimQuest(quest.id)}
                         className="text-xs bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-2.5 py-0.5 rounded cursor-pointer"
                       >
                         Claim
@@ -271,7 +305,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-2">
-              {user.connectedAccounts.map((acc) => (
+              {(user?.connectedAccounts || []).map((acc) => (
                 <div
                   key={acc.platform}
                   className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80 flex items-center justify-between"

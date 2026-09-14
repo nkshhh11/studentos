@@ -16,7 +16,7 @@ import {
 import { RoadmapNode } from '../../types/studentos';
 
 export default function RoadmapsPage() {
-  const { roadmaps, updateNodeStatus } = useStudentOS();
+  const { roadmaps, updateNodeStatus, requireAuth } = useStudentOS();
   const [selectedRoadmapId, setSelectedRoadmapId] = useState<string>('rm_swe');
 
   // Skill Node Modal state
@@ -25,13 +25,15 @@ export default function RoadmapsPage() {
   const activeRoadmap = roadmaps.find((r) => r.id === selectedRoadmapId) || roadmaps[0];
 
   const handleStatusChange = (status: RoadmapNode['status']) => {
-    if (selectedNode) {
-      updateNodeStatus(selectedNode.roadmapId, selectedNode.node.id, status);
-      setSelectedNode({
-        ...selectedNode,
-        node: { ...selectedNode.node, status },
-      });
-    }
+    requireAuth(() => {
+      if (selectedNode) {
+        updateNodeStatus(selectedNode.roadmapId, selectedNode.node.id, status);
+        setSelectedNode({
+          ...selectedNode,
+          node: { ...selectedNode.node, status },
+        });
+      }
+    }, 'Sign in to update your skill tree progress and earn XP.');
   };
 
   const getStatusBadge = (status: RoadmapNode['status']) => {

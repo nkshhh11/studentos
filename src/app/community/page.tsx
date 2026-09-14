@@ -11,10 +11,10 @@ export default function CommunityPage() {
 
   // Build current user ranking entry
   const userLeaderboardEntry = {
-    id: user.id,
-    name: `${user.name} (You)`,
-    avatar: user.avatar,
-    college: user.college,
+    id: user?.id || 'guest',
+    name: user?.name ? `${user.name} (You)` : 'You (Guest)',
+    avatar: user?.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=student',
+    college: user?.college || 'Engineering Student',
     streak: streak.currentStreak,
     xp: gamification.xp,
     level: gamification.level,

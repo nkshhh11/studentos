@@ -26,16 +26,16 @@ export default function OnboardingPage() {
 
   // Form State
   const [authMethod, setAuthMethod] = useState<'google' | 'github' | 'email'>('github');
-  const [name, setName] = useState(user.name || 'Alex Chen');
-  const [email, setEmail] = useState(user.email || 'alex.chen@university.edu');
-  const [college, setCollege] = useState(user.college || 'Stanford University');
-  const [branch, setBranch] = useState(user.branch || 'Computer Science & Engineering');
-  const [year, setYear] = useState(user.year || '3rd Year');
-  const [graduationYear, setGraduationYear] = useState(user.graduationYear || '2027');
-  const [skillLevel, setSkillLevel] = useState<SkillLevel>(user.skillLevel || 'Intermediate');
-  const [careerGoal, setCareerGoal] = useState<CareerGoal>(user.careerGoal || 'Software Engineer');
+  const [name, setName] = useState(user?.name || 'Alex Chen');
+  const [email, setEmail] = useState(user?.email || 'alex.chen@university.edu');
+  const [college, setCollege] = useState(user?.college || 'Stanford University');
+  const [branch, setBranch] = useState(user?.branch || 'Computer Science & Engineering');
+  const [year, setYear] = useState(user?.year || '3rd Year');
+  const [graduationYear, setGraduationYear] = useState(user?.graduationYear || '2027');
+  const [skillLevel, setSkillLevel] = useState<SkillLevel>(user?.skillLevel || 'Intermediate');
+  const [careerGoal, setCareerGoal] = useState<CareerGoal>(user?.careerGoal || 'Software Engineer');
   const [selectedLangs, setSelectedLangs] = useState<ProgrammingLanguage[]>(
-    user.selectedLanguages || ['C++', 'Python', 'JavaScript']
+    user?.selectedLanguages || ['C++', 'Python', 'JavaScript']
   );
   const [usernames, setUsernames] = useState<{ [key in PlatformName]?: string }>({
     LeetCode: 'alex_code',
@@ -43,7 +43,7 @@ export default function OnboardingPage() {
     CodeChef: 'alex_chef',
     GitHub: 'alexchen-dev',
   });
-  const [studyTime, setStudyTime] = useState<AvailableStudyTime>(user.availableStudyTime || '3 hours/day');
+  const [studyTime, setStudyTime] = useState<AvailableStudyTime>(user?.availableStudyTime || '3 hours/day');
   const [isGenerating, setIsGenerating] = useState(false);
   const [genSteps, setGenSteps] = useState([
     { label: 'Connecting External Coding Accounts', done: false },

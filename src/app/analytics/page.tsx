@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useStudentOS } from '../../context/StudentOSContext';
 import {
   BarChart3,
   Calendar,
   Clock,
-  BookMarked,
   FileText,
   Plus,
   Trash2,
-  Bookmark as BookmarkIcon,
-  Sparkles,
 } from 'lucide-react';
 
 import {
@@ -25,19 +23,28 @@ import {
   Area,
 } from 'recharts';
 
-export default function AnalyticsPage() {
+function AnalyticsContent() {
   const {
     user,
-    gamification,
     notes,
     bookmarks,
     addNote,
     deleteNote,
     addBookmark,
     deleteBookmark,
+    requireAuth,
   } = useStudentOS();
 
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   const [activeTab, setActiveTab] = useState<'reports' | 'planner' | 'notes' | 'bookmarks'>('reports');
+
+  useEffect(() => {
+    if (tabParam === 'notes' || tabParam === 'planner' || tabParam === 'bookmarks' || tabParam === 'reports') {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   // Notes Form State
   const [newNoteTitle, setNewNoteTitle] = useState('');
@@ -61,29 +68,45 @@ export default function AnalyticsPage() {
 
   const handleAddNote = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newNoteTitle.trim() && newNoteContent.trim()) {
-      addNote({
-        title: newNoteTitle.trim(),
-        content: newNoteContent.trim(),
-        tags: [newNoteTag],
-      });
-      setNewNoteTitle('');
-      setNewNoteContent('');
-    }
+    requireAuth(() => {
+      if (newNoteTitle.trim() && newNoteContent.trim()) {
+        addNote({
+          title: newNoteTitle.trim(),
+          content: newNoteContent.trim(),
+          tags: [newNoteTag],
+        });
+        setNewNoteTitle('');
+        setNewNoteContent('');
+      }
+    }, 'Sign in to save and organize your personal study notes.');
+  };
+
+  const handleDeleteNote = (id: string) => {
+    requireAuth(() => {
+      deleteNote(id);
+    }, 'Sign in to manage your saved notes.');
   };
 
   const handleAddBookmark = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newBmTitle.trim() && newBmUrl.trim()) {
-      addBookmark({
-        title: newBmTitle.trim(),
-        url: newBmUrl.trim(),
-        category: newBmCategory,
-        type: 'Article',
-      });
-      setNewBmTitle('');
-      setNewBmUrl('');
-    }
+    requireAuth(() => {
+      if (newBmTitle.trim() && newBmUrl.trim()) {
+        addBookmark({
+          title: newBmTitle.trim(),
+          url: newBmUrl.trim(),
+          category: newBmCategory,
+          type: 'Article',
+        });
+        setNewBmTitle('');
+        setNewBmUrl('');
+      }
+    }, 'Sign in to save personal study bookmarks.');
+  };
+
+  const handleDeleteBookmark = (id: string) => {
+    requireAuth(() => {
+      deleteBookmark(id);
+    }, 'Sign in to manage your saved bookmarks.');
   };
 
   return (
@@ -99,7 +122,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2 border-b border-zinc-800 pb-3">
+      <div className="flex gap-2 border-b border-zinc-800 pb-3 flex-wrap">
         <button
           onClick={() => setActiveTab('reports')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
@@ -118,7 +141,7 @@ export default function AnalyticsPage() {
               : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
           }`}
         >
-          🗓️ Smart Study Planner ({user.availableStudyTime})
+          🗓️ Smart Study Planner & Calendar ({user?.availableStudyTime || '3-4 hrs/day'})
         </button>
         <button
           onClick={() => setActiveTab('notes')}
@@ -146,7 +169,6 @@ export default function AnalyticsPage() {
       {activeTab === 'reports' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Chart 1: Study Hours per day */}
             <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -167,7 +189,6 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Chart 2: Problems Solved Trend */}
             <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -191,14 +212,16 @@ export default function AnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 2: Smart Study Planner */}
+      {/* Tab 2: Smart Study Planner / Calendar */}
       {activeTab === 'planner' && (
         <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 space-y-4">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
-              Allocated Time: {user.availableStudyTime}
+              Allocated Time: {user?.availableStudyTime || '3-4 hrs/day'}
             </span>
-            <h2 className="text-xl font-extrabold text-white mt-2">Adaptive Weekly Timetable</h2>
+            <h2 className="text-xl font-extrabold text-white mt-2 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-blue-400" /> Adaptive Weekly Calendar & Study Schedule
+            </h2>
             <p className="text-xs text-zinc-400 mt-0.5">
               Automatically balances DSA problem solving, core computer science concepts & project work.
             </p>
@@ -268,26 +291,34 @@ export default function AnalyticsPage() {
             </button>
           </form>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {notes.map((n) => (
-              <div key={n.id} className="p-4 bg-zinc-900/90 rounded-2xl border border-zinc-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-white">{n.title}</h4>
-                  <button onClick={() => deleteNote(n.id)} className="text-zinc-500 hover:text-rose-400">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+          {notes.length === 0 ? (
+            <div className="p-8 text-center bg-zinc-900/60 rounded-3xl border border-zinc-800 space-y-2">
+              <FileText className="w-8 h-8 text-amber-400 mx-auto opacity-80" />
+              <h4 className="text-sm font-bold text-white">No notes yet</h4>
+              <p className="text-xs text-zinc-400">Save key algorithms, solution patterns, or personal study reminders above.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {notes.map((n) => (
+                <div key={n.id} className="p-4 bg-zinc-900/90 rounded-2xl border border-zinc-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-white">{n.title}</h4>
+                    <button onClick={() => handleDeleteNote(n.id)} className="text-zinc-500 hover:text-rose-400 cursor-pointer">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-zinc-300 leading-relaxed">{n.content}</p>
+                  <div className="flex flex-wrap gap-1 pt-2">
+                    {n.tags.map((t) => (
+                      <span key={t} className="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/20">
+                        #{t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-xs text-zinc-300 leading-relaxed">{n.content}</p>
-                <div className="flex flex-wrap gap-1 pt-2">
-                  {n.tags.map((t) => (
-                    <span key={t} className="text-[10px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/20">
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -332,28 +363,44 @@ export default function AnalyticsPage() {
             </button>
           </form>
 
-          <div className="space-y-2">
-            {bookmarks.map((bm) => (
-              <div key={bm.id} className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800 flex items-center justify-between text-xs">
-                <div>
-                  <a href={bm.url} target="_blank" rel="noreferrer" className="font-bold text-white hover:text-purple-300">
-                    {bm.title}
-                  </a>
-                  <div className="text-[10px] text-zinc-400">{bm.url}</div>
+          {bookmarks.length === 0 ? (
+            <div className="p-8 text-center bg-zinc-900/60 rounded-3xl border border-zinc-800 space-y-2">
+              <Calendar className="w-8 h-8 text-purple-400 mx-auto opacity-80" />
+              <h4 className="text-sm font-bold text-white">No bookmarks yet</h4>
+              <p className="text-xs text-zinc-400">Save helpful articles, documentation, or video tutorials for quick access.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {bookmarks.map((bm) => (
+                <div key={bm.id} className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800 flex items-center justify-between text-xs">
+                  <div>
+                    <a href={bm.url} target="_blank" rel="noreferrer" className="font-bold text-white hover:text-purple-300">
+                      {bm.title}
+                    </a>
+                    <div className="text-[10px] text-zinc-400">{bm.url}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full text-[10px]">
+                      {bm.category}
+                    </span>
+                    <button onClick={() => handleDeleteBookmark(bm.id)} className="text-zinc-500 hover:text-rose-400 cursor-pointer">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full text-[10px]">
-                    {bm.category}
-                  </span>
-                  <button onClick={() => deleteBookmark(bm.id)} className="text-zinc-500 hover:text-rose-400">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-xs text-zinc-400">Loading vault...</div>}>
+      <AnalyticsContent />
+    </Suspense>
   );
 }

@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
-  LayoutDashboard,
+  Home,
+  CheckSquare,
+  FileText,
+  Calendar,
   Code2,
   BookOpen,
   Map,
   Swords,
-  FolderGit2,
   BarChart3,
   Bot,
   Trophy,
@@ -19,59 +21,116 @@ import { useStudentOS } from '../../context/StudentOSContext';
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeTabParam = searchParams.get('tab');
   const { isAdminView } = useStudentOS();
 
-  const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, badge: null },
+  const primaryItems = [
+    { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Tasks', href: '/projects', icon: CheckSquare },
+    { name: 'Notes', href: '/analytics?tab=notes', icon: FileText, tabKey: 'notes' },
+    { name: 'Calendar', href: '/analytics?tab=planner', icon: Calendar, tabKey: 'planner' },
+  ];
+
+  const moduleItems = [
     { name: 'Problem Explorer', href: '/problems', icon: Code2, badge: '50+' },
     { name: 'Learn & Hub', href: '/learn', icon: BookOpen, badge: null },
     { name: 'Roadmaps & Trees', href: '/roadmaps', icon: Map, badge: null },
     { name: 'Quests & Badges', href: '/gamification', icon: Swords, badge: 'XP' },
-    { name: 'Projects & Tasks', href: '/projects', icon: FolderGit2, badge: null },
-    { name: 'Analytics & Planner', href: '/analytics', icon: BarChart3, badge: null },
+    { name: 'Analytics & Reports', href: '/analytics', icon: BarChart3, badge: null },
     { name: 'AI Mentor', href: '/ai-mentor', icon: Bot, badge: 'AI' },
     { name: 'Leaderboard', href: '/community', icon: Trophy, badge: null },
   ];
 
   if (isAdminView) {
-    navItems.push({ name: 'Admin Dashboard', href: '/admin', icon: ShieldAlert, badge: 'Admin' });
+    moduleItems.push({ name: 'Admin Dashboard', href: '/admin', icon: ShieldAlert, badge: 'Admin' });
   }
+
+  const isPrimaryActive = (item: typeof primaryItems[0]) => {
+    if (item.href.includes('?tab=')) {
+      return pathname === '/analytics' && activeTabParam === item.tabKey;
+    }
+    return pathname === item.href;
+  };
+
+  const isModuleActive = (item: typeof moduleItems[0]) => {
+    if (item.href === '/analytics') {
+      return pathname === '/analytics' && !activeTabParam;
+    }
+    return pathname === item.href;
+  };
 
   return (
     <aside className="w-56 bg-zinc-950/80 border-r border-zinc-800/80 flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-3 hidden md:flex">
-      <div className="space-y-0.5 flex-1">
-        <div className="px-2.5 py-1.5 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
-          Navigation
-        </div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all group ${
-                isActive
-                  ? 'bg-zinc-800 text-zinc-100 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Icon
-                  className={`w-4 h-4 transition-colors ${
-                    isActive ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'
+      <div className="space-y-4 flex-1">
+        {/* Core Quick Access (Home, Tasks, Notes, Calendar) */}
+        <div>
+          <div className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+            Quick Access
+          </div>
+          <div className="space-y-0.5 mt-1">
+            {primaryItems.map((item) => {
+              const Icon = item.icon;
+              const active = isPrimaryActive(item);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all group ${
+                    active
+                      ? 'bg-zinc-800 text-zinc-100 shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
                   }`}
-                />
-                <span>{item.name}</span>
-              </div>
-              {item.badge && (
-                <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/50">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+                >
+                  <Icon
+                    className={`w-4 h-4 transition-colors ${
+                      active ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'
+                    }`}
+                  />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* OS Modules */}
+        <div>
+          <div className="px-2.5 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+            Modules
+          </div>
+          <div className="space-y-0.5 mt-1">
+            {moduleItems.map((item) => {
+              const Icon = item.icon;
+              const active = isModuleActive(item);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all group ${
+                    active
+                      ? 'bg-zinc-800 text-zinc-100 shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon
+                      className={`w-4 h-4 transition-colors ${
+                        active ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'
+                      }`}
+                    />
+                    <span>{item.name}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/50">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Target Status Card */}

@@ -18,6 +18,15 @@ export type ProgrammingLanguage = 'C' | 'C++' | 'Java' | 'Python' | 'JavaScript'
 
 export type PlatformName = 'LeetCode' | 'CodeChef' | 'Codeforces' | 'HackerRank' | 'GeeksforGeeks' | 'GitHub';
 
+export type AuthMethod = 'email' | 'signin' | 'signup' | 'google' | 'microsoft' | 'otp' | 'demo';
+
+export interface AuthSession {
+  token: string;
+  authMethod: AuthMethod;
+  authenticatedAt: string;
+  phoneNumber?: string;
+}
+
 export interface ConnectedAccount {
   platform: PlatformName;
   username: string;
@@ -32,6 +41,7 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   avatar: string;
   college: string;
   branch: string;
@@ -43,6 +53,7 @@ export interface UserProfile {
   connectedAccounts: ConnectedAccount[];
   availableStudyTime: AvailableStudyTime;
   isOnboarded: boolean;
+  isDemoUser?: boolean;
   bio?: string;
   createdAt: string;
 }

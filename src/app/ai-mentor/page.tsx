@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function AIMentorPage() {
-  const { user, aiMessages, sendAIMessage, careerReport } = useStudentOS();
+  const { user, aiMessages, sendAIMessage, careerReport, requireAuth } = useStudentOS();
   const [inputText, setInputText] = useState('');
   const [activeTab, setActiveTab] = useState<'mentor' | 'career' | 'resume' | 'company'>('mentor');
 
@@ -51,25 +51,31 @@ export default function AIMentorPage() {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputText.trim()) {
-      sendAIMessage(inputText.trim());
-      setInputText('');
-    }
+    requireAuth(() => {
+      if (inputText.trim()) {
+        sendAIMessage(inputText.trim());
+        setInputText('');
+      }
+    }, 'Sign in to chat with your personal AI SDE Mentor.');
   };
 
   const handleQuickSuggestion = (text: string) => {
-    sendAIMessage(text);
+    requireAuth(() => {
+      sendAIMessage(text);
+    }, 'Sign in to chat with your personal AI SDE Mentor.');
   };
 
   const handleAnalyzeResume = () => {
-    if (!resumeText.trim()) return;
-    setIsAnalyzingResume(true);
-    setTimeout(() => {
-      setIsAnalyzingResume(false);
-      setResumeFeedback(
-        "ATS Score: 78/100 📄\n\nStrengths:\n✓ Strong project section with technologies (Next.js, TypeScript, C++)\n✓ Clear education metrics\n\nSuggestions for Improvement:\n• Add quantifiable impact metrics (e.g. 'Optimized API response time by 35%')\n• Include key ATS keywords for SDE: 'Data Structures', 'REST APIs', 'Unit Testing', 'CI/CD'."
-      );
-    }, 1800);
+    requireAuth(() => {
+      if (!resumeText.trim()) return;
+      setIsAnalyzingResume(true);
+      setTimeout(() => {
+        setIsAnalyzingResume(false);
+        setResumeFeedback(
+          "ATS Score: 78/100 📄\n\nStrengths:\n✓ Strong project section with technologies (Next.js, TypeScript, C++)\n✓ Clear education metrics\n\nSuggestions for Improvement:\n• Add quantifiable impact metrics (e.g. 'Optimized API response time by 35%')\n• Include key ATS keywords for SDE: 'Data Structures', 'REST APIs', 'Unit Testing', 'CI/CD'."
+        );
+      }, 1800);
+    }, 'Sign in to run ATS AI Analysis on your resume.');
   };
 
   return (
